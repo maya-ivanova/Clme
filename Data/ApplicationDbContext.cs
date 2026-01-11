@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 
-namespace Coolme.Data
+namespace Clme.Data
 {
     public class ApplicationDbContext : DbContext
     {
