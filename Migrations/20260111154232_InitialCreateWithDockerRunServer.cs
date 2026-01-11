@@ -5,7 +5,7 @@
 namespace Clme.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialOnDockerRunDb : Migration
+    public partial class InitialCreateWithDockerRunServer : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
