@@ -28,12 +28,12 @@ jobs:
           dotnet-version: '8.0'
 
       - name: Restore dependencies
-        run: dotnet restore
+        run: dotnet restore Clme/Clme.slnx
 
       - name: Build
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build Clme/Clme.slnx --no-restore --configuration Release
 
       - name: Run Tests
         env:
           ConnectionStrings__DefaultConnection: "Server=localhost;Database=ACShopDb;User Id=sa;Password=${{ secrets.AC_SHOP_DB_PW }};TrustServerCertificate=True"
-        run: dotnet test --no-build --verbosity normal
+        run: dotnet test Clme/Clme.slnx --no-build --verbosity normal

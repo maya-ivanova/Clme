@@ -3,6 +3,12 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Exclude local configuration files
+appsettings.json
+appsettings.Development.json
+[Bb]in/
+[Oo]bj/
+
 # User-specific files
 *.rsuser
 *.suo
@@ -362,6 +368,3 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# Exclude local configuration files
-appsettings.json
-appsettings.Development.json
