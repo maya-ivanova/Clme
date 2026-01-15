@@ -27,13 +27,15 @@ jobs:
         with:
           dotnet-version: '8.0'
 
-      - name: Restore dependencies
-        run: dotnet restore Clme/Clme.slnx
+      - name: Restore
+        run: dotnet restore Coolme.slnx
 
       - name: Build
-        run: dotnet build Clme/Clme.slnx --no-restore --configuration Release
+        run: dotnet build Coolme.slnx --configuration Release --no-restore
 
       - name: Run Tests
         env:
+          # This connects your code to the Docker container above
           ConnectionStrings__DefaultConnection: "Server=localhost;Database=ACShopDb;User Id=sa;Password=${{ secrets.AC_SHOP_DB_PW }};TrustServerCertificate=True"
-        run: dotnet test Clme/Clme.slnx --no-build --verbosity normal
+        # Running against the solution file ensures all test projects are found
+        run: dotnet test Coolme.slnx --configuration Release --no-build --verbosity normal
