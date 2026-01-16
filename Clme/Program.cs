@@ -1,4 +1,5 @@
 using Clme.Data;
+using Clme.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -32,4 +33,21 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
-app.Run();
+
+using (var scope = app.Services.CreateScope())
+{ 
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    if (!context.Products.Any())
+    {
+        context.Products.Add(new Product
+        {
+            Brand = "Daikin",
+            Model = "Sensira",
+            Btu = 12000,
+            Price = 899,
+            Description = "Energy efficient air conditioner"
+        });
+        context.SaveChanges();
+    }
+}
+    app.Run();

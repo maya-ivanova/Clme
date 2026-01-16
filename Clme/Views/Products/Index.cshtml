@@ -1,0 +1,29 @@
+@model IEnumerable<Clme.Data.Entities.Product>
+
+    @{
+    ViewData["Title"] = "Products";
+    }
+
+    <h1>Air Conditioners</h1>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Brand</th>
+                <th>Model</th>
+                <th>BTU</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in Model)
+    {
+            <tr>
+                <td>@product.Brand</td>
+                <td>@product.Model</td>
+                <td>@product.Btu</td>
+                <td>@product.Price.ToString("C")</td>
+            </tr>
+    }
+        </tbody>
+    </table>
