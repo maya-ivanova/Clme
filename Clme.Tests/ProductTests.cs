@@ -1,13 +1,14 @@
 ﻿using Clme.Data.Entities;
+using Clme.Data.Enums;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using Xunit;
 
 namespace Clme.Tests.Entities
 {
     public class ProductTests
     {
-        // Helper method to simulate validation
         private IList<ValidationResult> ValidateModel(object model)
         {
             var validationResults = new List<ValidationResult>();
@@ -22,11 +23,13 @@ namespace Clme.Tests.Entities
             // Arrange
             var product = new Product
             {
-                Brand = "Samsung",
+                Brand = new Brand { Name = "Samsung", Country = "Korea", LogoUrl = "url" },
+                Category = new Category { Name = "Wall Mounted" },
                 Model = "WindFree",
                 Price = 1200.00m,
                 Btu = 12000,
-                Description = "High efficiency AC"
+                EnergyClass = EnergyClass.A___,
+                IsAvailableAtStore = true
             };
 
             // Act
@@ -37,14 +40,15 @@ namespace Clme.Tests.Entities
         }
 
         [Theory]
-        [InlineData(400)]    // Below Range
-        [InlineData(11000)]  // Above Range
+        [InlineData(400)]    // Below Range (Limit is 500)
+        [InlineData(11000)]  // Above Range (Limit is 10000)
         public void Product_PriceOutsideRange_ShouldHaveValidationError(decimal invalidPrice)
         {
             // Arrange
             var product = new Product
             {
-                Brand = "LG",
+                Brand = new Brand { Name = "LG", Country = "Korea", LogoUrl = "url" },
+                Category = new Category { Name = "Wall Mounted" },
                 Model = "ArtCool",
                 Price = invalidPrice,
                 Btu = 12000
@@ -58,13 +62,14 @@ namespace Clme.Tests.Entities
         }
 
         [Fact]
-        public void Product_BrandExceedsMaxLength_ShouldHaveValidationError()
+        public void Product_ModelExceedsMaxLength_ShouldHaveValidationError()
         {
-            // Arrange
+            // Arrange - Note: We moved MaxLength to Model, Brand is now a class
             var product = new Product
             {
-                Brand = new string('A', 101), // 101 chars (Limit is 100)
-                Model = "Standard",
+                Brand = new Brand { Name = "Daikin", Country = "Japan", LogoUrl = "url" },
+                Category = new Category { Name = "Wall" },
+                Model = new string('A', 101), // Limit is 100
                 Price = 1000m,
                 Btu = 9000
             };
@@ -73,20 +78,21 @@ namespace Clme.Tests.Entities
             var results = ValidateModel(product);
 
             // Assert
-            Assert.Contains(results, r => r.MemberNames.Contains("Brand"));
+            Assert.Contains(results, r => r.MemberNames.Contains("Model"));
         }
 
         [Fact]
         public void Product_RequiredFieldsMissing_ShouldHaveValidationErrors()
         {
             // Arrange
-            var product = new Product(); // Brand and Model are null/missing
+            // Brand and Category are navigation properties and required by the compiler (null!)
+            // but the Validator checks for [Required] on simple types like Model.
+            var product = new Product(); 
 
             // Act
             var results = ValidateModel(product);
 
             // Assert
-            Assert.Contains(results, r => r.MemberNames.Contains("Brand"));
             Assert.Contains(results, r => r.MemberNames.Contains("Model"));
         }
     }

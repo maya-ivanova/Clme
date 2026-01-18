@@ -1,0 +1,9 @@
+﻿@model Clme.Models.ViewModels.Products.ProductDetailsViewModel
+
+<h2>@Model.PageTitle</h2>
+<div>Price: @Model.Product.Price.ToString("C")</div>
+
+@if (Model.IsHotDeal)
+    {
+    <span class="badge bg-danger">BIG SAVINGS!</span>
+    }

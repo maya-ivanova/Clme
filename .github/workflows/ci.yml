@@ -15,7 +15,7 @@ jobs:
         image: mcr.microsoft.com/mssql/server:2022-latest
         env:
           ACCEPT_EULA: 'Y'
-          MSSQL_SA_PASSWORD: ${{ secrets.AC_SHOP_DB_PW }}
+          MSSQL_SA_PASSWORD: ${{ secrets.AC_ONLINE_SHOP_DB_PW }}
         ports:
           - 1433:1433
 
@@ -26,6 +26,9 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0'
+          
+      - name: Check Formatting
+        run: dotnet format --verify-no-changes
 
       - name: Restore
         run: dotnet restore Coolme.slnx
@@ -36,6 +39,38 @@ jobs:
       - name: Run Tests
         env:
           # This connects your code to the Docker container above
-          ConnectionStrings__DefaultConnection: "Server=localhost;Database=ACShopDb;User Id=sa;Password=${{ secrets.AC_SHOP_DB_PW }};TrustServerCertificate=True"
+          ConnectionStrings__DefaultConnection: "Server=localhost;Database=AirCondsOnlineShopDB;User Id=sa;Password=${{ secrets.AC_ONLINE_SHOP_DB_PW }};TrustServerCertificate=True"
         # Running against the solution file ensures all test projects are found
         run: dotnet test Coolme.slnx --configuration Release --no-build --verbosity normal
+        
+      - name: Publish
+        run: dotnet publish Clme/Clme.csproj --configuration Release --output ./publish
+
+      - name: Verify Service Health
+        shell: bash
+        run: |
+          # Start the app in the background
+          dotnet run --project Clme/Clme.csproj --urls "http://localhost:5002" & 
+          PID=$!
+          
+          # Wait for it to warm up
+          sleep 20
+          
+          # Ping the health endpoint on HTTP port 5002 set in the launchSettings.json of the project
+          RESPONSE=$(curl -s http://localhost:5002/health)
+          echo "Health Check Response: $RESPONSE"
+          
+          if [[ $RESPONSE == *"Healthy"* ]]; then
+            echo "System is healthy!"
+            kill $PID
+          else
+            echo "System check failed! Response was: $RESPONSE"
+            kill $PID
+            exit 1
+          fi
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: clme-app-build
+          path: ./publish
