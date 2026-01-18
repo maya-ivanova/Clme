@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Clme.Data.Entities
 {
     public class Product
-        {
+    {
         public int Id { get; set; }
 
         // Foreign Keys
@@ -35,9 +35,9 @@ namespace Clme.Data.Entities
         public string? Description { get; set; }
 
         public bool IsAvailableAtStore { get; set; } = true;
-        }
-
     }
+
+}
 
 
 

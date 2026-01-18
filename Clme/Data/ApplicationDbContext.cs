@@ -18,7 +18,7 @@ namespace Clme.Data
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
-            {
+        {
             base.OnModelCreating(modelBuilder);
 
             // Convert Enums to Strings in the Database to make them readable from any OS
@@ -33,6 +33,6 @@ namespace Clme.Data
             modelBuilder.Entity<Product>()
                 .Property(p => p.Price)
                 .HasPrecision(18, 2);
-            }
         }
     }
+}

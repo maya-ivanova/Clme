@@ -1,9 +1,9 @@
 ﻿using Clme.Data.Enums;
 
 namespace Clme.Models.DTOs.Product
-    {
+{
     public class ProductDto
-        {
+    {
         public int Id { get; set; }
 
         public string Brand { get; set; } = null!;
@@ -18,6 +18,6 @@ namespace Clme.Models.DTOs.Product
         public DiscountPercent DiscountPercent { get; set; }
 
         public bool IsAvailableAtStore { get; set; }
-        }
-
     }
+
+}

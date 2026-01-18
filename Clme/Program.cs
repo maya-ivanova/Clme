@@ -36,15 +36,15 @@ var healthBuilder = builder.Services.AddHealthChecks()
 
 // Environment-specific Disk Checks
 if (isWindows && builder.Environment.IsDevelopment())
-    {
+{
     healthBuilder.AddDiskStorageHealthCheck(opt => opt.AddDrive("C:\\", 500), name: "disk");
-    }
+}
 else if (isLinux && (isDocker || isGitHubActions))
-    {
+{
     // Simplified: Both Docker and GH Actions use "/" on Linux
     int threshold = isGitHubActions ? 100 : 200;
     healthBuilder.AddDiskStorageHealthCheck(opt => opt.AddDrive("/", threshold), name: "disk");
-    }
+}
 
 // NOW we build
 var app = builder.Build();
@@ -55,9 +55,9 @@ var app = builder.Build();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 
 if (!app.Environment.IsDevelopment())
-    {
+{
     app.UseHsts();
-    }
+}
 
 // Configure the HTTP request pipeline
 app.UseHttpsRedirection();
@@ -75,40 +75,40 @@ app.MapControllerRoute(
 
 // 5. SEEDING (Clean and Async)
 using (var scope = app.Services.CreateScope())
-    {
+{
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<ApplicationDbContext>();
 
     // Check migrations before seeding
     var pending = await context.Database.GetPendingMigrationsAsync();
     if (pending.Any())
-        {
+    {
         // For a graduation project, it's chic to auto-apply them
         await context.Database.MigrateAsync();
-        }
+    }
 
     await DbProductInitializer.SeedAsync(context);
-    }
+}
 
 // 6. MAP HEALTH ENDPOINT (With your custom JSON writer)
 app.MapHealthChecks("/health", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
-    {
+{
     ResponseWriter = async (context, report) =>
     {
         context.Response.ContentType = "application/json";
         var result = System.Text.Json.JsonSerializer.Serialize(new
-            {
+        {
             status = report.Status.ToString(),
             checks = report.Entries.Select(e => new
-                {
+            {
                 name = e.Key,
                 status = e.Value.Status.ToString(),
                 description = e.Value.Description
-                }),
+            }),
             server_uptime = TimeSpan.FromMilliseconds(Environment.TickCount64).ToString()
-            });
+        });
         await context.Response.WriteAsync(result);
     }
-    });
+});
 
 app.Run();

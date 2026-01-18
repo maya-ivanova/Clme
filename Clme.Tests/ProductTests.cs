@@ -87,7 +87,7 @@ namespace Clme.Tests.Entities
             // Arrange
             // Brand and Category are navigation properties and required by the compiler (null!)
             // but the Validator checks for [Required] on simple types like Model.
-            var product = new Product(); 
+            var product = new Product();
 
             // Act
             var results = ValidateModel(product);

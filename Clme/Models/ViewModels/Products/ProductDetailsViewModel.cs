@@ -1,9 +1,9 @@
 ﻿using Clme.Models.DTOs.Product;
 
 namespace Clme.Models.ViewModels.Products
-    {
+{
     public class ProductDetailsViewModel
-        {
+    {
         // We wrap the DTO here
         public ProductDto Product { get; set; } = null!;
 
@@ -14,5 +14,5 @@ namespace Clme.Models.ViewModels.Products
 
         // Chic extra: A flag to show a "Hot Deal" badge if discount > 20%
         public bool IsHotDeal => (int)Product.DiscountPercent >= 20;
-        }
     }
+}

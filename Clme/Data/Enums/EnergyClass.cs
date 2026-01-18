@@ -1,7 +1,7 @@
 ﻿namespace Clme.Data.Enums
-    {
+{
     public enum EnergyClass
-        {
+    {
         A___ = 0,
         A__ = 1,
         A_ = 2,
@@ -12,5 +12,5 @@
         E = 7,
         F = 8,
         G = 9
-        }
     }
+}
