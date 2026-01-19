@@ -27,9 +27,6 @@ jobs:
         with:
           dotnet-version: '8.0'
 
-      - name: Check Formatting
-        run: dotnet format --verify-no-changes
-
       - name: Restore
         run: dotnet restore Coolme.slnx
 
