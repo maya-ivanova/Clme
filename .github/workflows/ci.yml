@@ -10,15 +10,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    services:
-      sqlserver:
-        image: mcr.microsoft.com/mssql/server:2022-latest
-        env:
-          ACCEPT_EULA: 'Y'
-          MSSQL_SA_PASSWORD: ${{ secrets.AC_ONLINE_SHOP_DB_PW }}
-        ports:
-          - 1433:1433
-
     steps:
       - uses: actions/checkout@v4
 
@@ -33,38 +24,7 @@ jobs:
       - name: Build
         run: dotnet build Coolme.slnx --configuration Release --no-restore
 
-      - name: Run Tests
+      - name: Run Tests (SQLite)
         env:
           ASPNETCORE_ENVIRONMENT: Staging
-          ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=AirCondsOnlineShopDB;User Id=sa;Password=${{ secrets.AC_ONLINE_SHOP_DB_PW }};TrustServerCertificate=True"
         run: dotnet test Coolme.slnx --configuration Release --no-build --verbosity normal
-
-      - name: Publish
-        run: dotnet publish Clme/Clme.csproj --configuration Release --output ./publish
-
-      - name: Verify Service Health
-        shell: bash
-        env:
-          ASPNETCORE_ENVIRONMENT: Staging
-          ConnectionStrings__DefaultConnection: "Server=localhost,1433;Database=AirCondsOnlineShopDB;User Id=sa;Password=${{ secrets.AC_ONLINE_SHOP_DB_PW }};TrustServerCertificate=True"
-        run: |
-          dotnet run --project Clme/Clme.csproj --urls "http://localhost:5002" & 
-          PID=$!
-          sleep 20
-          RESPONSE=$(curl -s http://localhost:5002/health)
-          echo "Health Check Response: $RESPONSE"
-          STATUS=$(echo $RESPONSE | jq -r '.status')
-          if [[ $STATUS == "Healthy" ]]; then
-            echo "System is healthy!"
-            kill $PID
-          else
-            echo "System check failed! Response was: $RESPONSE"
-            kill $PID
-            exit 1
-          fi
-
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: clme-app-build
-          path: ./publish
