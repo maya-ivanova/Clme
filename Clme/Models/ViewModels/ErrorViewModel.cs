@@ -1,4 +1,4 @@
-namespace Clme.Models
+namespace Clme.Models.ViewModels
 {
     public class ErrorViewModel
     {

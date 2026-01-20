@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using Clme.Models;
+using Clme.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Clme.Controllers

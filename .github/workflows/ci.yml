@@ -10,15 +10,6 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
-    services:
-      sqlserver:
-        image: mcr.microsoft.com/mssql/server:2022-latest
-        env:
-          ACCEPT_EULA: 'Y'
-          MSSQL_SA_PASSWORD: ${{ secrets.AC_SHOP_DB_PW }}
-        ports:
-          - 1433:1433
-
     steps:
       - uses: actions/checkout@v4
 
@@ -33,9 +24,7 @@ jobs:
       - name: Build
         run: dotnet build Coolme.slnx --configuration Release --no-restore
 
-      - name: Run Tests
+      - name: Run Tests (SQLite)
         env:
-          # This connects your code to the Docker container above
-          ConnectionStrings__DefaultConnection: "Server=localhost;Database=ACShopDb;User Id=sa;Password=${{ secrets.AC_SHOP_DB_PW }};TrustServerCertificate=True"
-        # Running against the solution file ensures all test projects are found
+          ASPNETCORE_ENVIRONMENT: Staging
         run: dotnet test Coolme.slnx --configuration Release --no-build --verbosity normal

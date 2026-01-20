@@ -1,0 +1,40 @@
+@using Clme.Data.Enums
+@using Clme.Models.ViewModels.Products
+@model ProductListViewModel
+
+<h1>Available products for sale</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Brand</th>
+            <th>Model</th>
+            <th>BTU</th>
+            <th>Energy</th>
+            <th>Price</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var p in Model.Products)
+            {
+            <tr>
+                <td>@p.Brand</td>
+                <td>@p.Model</td>
+                <td>@p.Btu</td>
+                <td>@p.EnergyClass</td>
+                <td>
+                    @if (p.DiscountPercent != DiscountPercent.None)
+                        {
+                        <span class="text-danger">
+                            @p.Price &euro; (-@((int)p.DiscountPercent)%)
+                        </span>
+                        }
+                    else
+                        {
+                            @($"{p.Price} &euro;")
+                        }
+                </td>
+            </tr>
+            }
+    </tbody>
+</table>
