@@ -53,7 +53,8 @@ jobs:
           sleep 20
           RESPONSE=$(curl -s http://localhost:5002/health)
           echo "Health Check Response: $RESPONSE"
-          if [[ $RESPONSE == *"Healthy"* ]]; then
+          STATUS=$(echo $RESPONSE | jq -r '.status')
+          if [[ $STATUS == "Healthy" ]]; then
             echo "System is healthy!"
             kill $PID
           else

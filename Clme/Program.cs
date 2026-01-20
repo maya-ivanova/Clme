@@ -12,21 +12,15 @@ var builder = WebApplication.CreateBuilder(args);
 // 1. CONFIGURATION
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
+if (string.IsNullOrEmpty(connectionString))
+    {
+    throw new InvalidOperationException("Connection string 'DefaultConnection' is not configured.");
+    }
+
 // 2. SERVICE REGISTRATION
 builder.Services.AddControllersWithViews();
-
-// Register DbContext only if connection string is present
-if (!string.IsNullOrEmpty(connectionString))
-    {
-    builder.Services.AddDbContext<ApplicationDbContext>(options =>
-        options.UseSqlServer(connectionString));
-    }
-else
-    {
-    // Fallback for dev without SQL running
-    //builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    //    options.UseInMemoryDatabase("FallbackDb"));
-    }
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlServer(connectionString));
 
 builder.Services.AddScoped<IProductService, ProductService>();
 
@@ -36,24 +30,9 @@ var healthBuilder = builder.Services.AddHealthChecks()
     {
         var uptime = TimeSpan.FromMilliseconds(Environment.TickCount64);
         return HealthCheckResult.Healthy($"Uptime: {uptime}");
-    });
-
-// Add SQL + EF migration checks only if connection string is valid
-if (!string.IsNullOrEmpty(connectionString))
-    {
-    healthBuilder.AddSqlServer(connectionString, name: "sql", failureStatus: HealthStatus.Unhealthy)
-                 .AddCheck<EfMigrationHealthCheck>("ef_migrations");
-    }
-
-// Environment-specific Disk Checks
-if (builder.Environment.IsDevelopment())
-    {
-    healthBuilder.AddDiskStorageHealthCheck(opt => opt.AddDrive("C:\\", 500), name: "disk");
-    }
-else if (builder.Environment.IsStaging() || builder.Environment.IsProduction())
-    {
-    healthBuilder.AddDiskStorageHealthCheck(opt => opt.AddDrive("/", 200), name: "disk");
-    }
+    })
+    .AddSqlServer(connectionString, name: "sql", failureStatus: HealthStatus.Unhealthy)
+    .AddCheck<EfMigrationHealthCheck>("ef_migrations");
 
 // 4. BUILD APP
 var app = builder.Build();
